@@ -1,15 +1,31 @@
 // Bongki Moon (bkmoon@snu.ac.kr)
 
+/*
+ *      Flight.java
+ * 
+ *      Data Structure Assignment 3
+ *      
+ *      Author  : Sejin Woo
+ *      Date    : 2023-11-03
+ * 
+ *      This file implement smallest element Flight
+ *      Flight will be used as an Edge in graph
+ */
+
 public class Flight {
 
-    public String departPortName;
-    public String arrivalPortName;
-    public int departPortID;
-    public int arrivalPortID;
-    public int departTime;
-    public int arrivalTime;
+    public String departPortName; // port name
+    public String arrivalPortName; // port name
+    public int departPortID; // port id encoded the port name
+    public int arrivalPortID; // port id encoded the port name
+    public int departTime; // when this flight will depart. as minute notation
+    public int arrivalTime; // when this flight will depart. as minute notation
 
-    // constructor
+    // Constructor
+    public Flight() {
+    }
+
+    // Constructor
     public Flight(String src, String dest, String stime, String dtime) {
         departPortID = encoder.encode(src);
         arrivalPortID = encoder.encode(dest);
@@ -26,23 +42,29 @@ public class Flight {
         arrivalTime = encoder.hmToMinute(arrivalTime);
     }
 
+    // Calculate and return total time from curTime to arrival at the destination
+    // that the passenger should take
     public int totalTime(Airport port, int curTime) {
-        int waitTime = departTime - (port.connectTime + curTime);
-        if (waitTime < 0)
-            waitTime += encoder.ONEDAY;
 
-        int travelTime = arrivalTime - departTime;
+        curTime %= encoder.ONEDAY;
+
+        int waitTime = port.connectTime; // Wait to connect this flight
+        waitTime += ((departTime - (port.connectTime + curTime) % encoder.ONEDAY) + encoder.ONEDAY) % encoder.ONEDAY;
+
+        int travelTime = arrivalTime - departTime; // Flight time
         if (travelTime < 0)
             travelTime += encoder.ONEDAY;
 
-        return waitTime + travelTime; // can exceed 24h
+        return waitTime + travelTime; // can exceed 24h = 1440m
     }
 
     public void print() {
         System.out
-                .print(String.format("[%s->%s:%04d->%04d]", departPortName, arrivalPortName, departTime, arrivalTime));
+                .print(String.format("[%s->%s:%04d->%04d]", departPortName, arrivalPortName,
+                        encoder.minuteToHM(departTime), encoder.minuteToHM(arrivalTime)));
     }
 
+    // just for debug
     public void debug() {
         System.out.println(String.format("Flight debug\n\tdPortName : %s\n\tdPortID : %d\n\tdTime : %04d",
                 departPortName, departPortID, departTime));
@@ -50,5 +72,6 @@ public class Flight {
                 arrivalPortName, arrivalPortID, arrivalTime));
     }
 
+    // Flight also need encoder from airport class
     private static Airport.Encode encoder = new Airport.Encode();
 }
