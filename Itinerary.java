@@ -1,13 +1,26 @@
 // Bongki Moon (bkmoon@snu.ac.kr)
 
-public class Itinerary
-{
+import java.util.ArrayList;
 
-  // constructor
-  Itinerary(...) {}
+public class Itinerary {
 
-  public boolean isFound() {}
+    public ArrayList<Flight> tickets;
 
-  public void print() {}
+    // constructor
+    public Itinerary(ArrayList<Flight> flights) {
+        tickets = new ArrayList<>(flights);
+    }
+
+    public boolean isFound() {
+        if (tickets.size() == 0)
+            return false;
+        return true;
+    }
+
+    public void print() {
+        for (Flight flt : tickets) {
+            flt.print();
+        }
+    }
 
 }
