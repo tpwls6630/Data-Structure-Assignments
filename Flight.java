@@ -29,14 +29,12 @@ public class Flight {
     public Flight(String src, String dest, String stime, String dtime) {
         departPortID = encoder.encode(src);
         arrivalPortID = encoder.encode(dest);
+
         departPortName = src;
         arrivalPortName = dest;
-        try {
-            departTime = Integer.parseInt(stime);
-            arrivalTime = Integer.parseInt(dtime);
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
+
+        departTime = Integer.parseInt(stime);
+        arrivalTime = Integer.parseInt(dtime);
 
         departTime = encoder.hmToMinute(departTime);
         arrivalTime = encoder.hmToMinute(arrivalTime);
@@ -46,14 +44,13 @@ public class Flight {
     // that the passenger should take
     public int totalTime(Airport port, int curTime) {
 
-        curTime %= encoder.ONEDAY;
+        curTime %= encoder.ONEDAY();
 
         int waitTime = port.connectTime; // Wait to connect this flight
-        waitTime += ((departTime - (port.connectTime + curTime) % encoder.ONEDAY) + encoder.ONEDAY) % encoder.ONEDAY;
+        waitTime += ((departTime - (port.connectTime + curTime) % encoder.ONEDAY()) + encoder.ONEDAY())
+                % encoder.ONEDAY();
 
-        int travelTime = arrivalTime - departTime; // Flight time
-        if (travelTime < 0)
-            travelTime += encoder.ONEDAY;
+        int travelTime = (arrivalTime - departTime + encoder.ONEDAY()) % encoder.ONEDAY(); // Flight time
 
         return waitTime + travelTime; // can exceed 24h = 1440m
     }

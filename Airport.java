@@ -21,11 +21,8 @@ public class Airport {
     // Constructor
     public Airport(String port, String connectTime) {
         portID = encoder.encode(port);
-        try {
-            this.connectTime = Integer.parseInt(connectTime);
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
+
+        this.connectTime = Integer.parseInt(connectTime);
 
         this.connectTime = encoder.hmToMinute(this.connectTime);
     }
@@ -49,6 +46,7 @@ public class Airport {
 
         private static int ENCODINGNUM = 27;// 3-letter port name will be encoded as radix 27.
                                             // Minimum is "AAA" = 757 and maximum is "ZZZ" = 19682
+        public static int MAXIMUM;
         public static int ONEDAY = 24 * 60; // One day is surely 1440 minutes
 
         public int encode(String str) {
@@ -79,6 +77,10 @@ public class Airport {
 
         public int minuteToHM(int m) {
             return (m / 60) * 100 + m % 60;
+        }
+
+        public int ONEDAY() {
+            return ONEDAY;
         }
     }
 

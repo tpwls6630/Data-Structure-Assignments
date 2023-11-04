@@ -25,18 +25,21 @@ public class Planner {
 
         portSize = portList.size();
 
-        for (int i = 0; i < HASHMAX; i++) {
+        for (int i = 0; i < encoder.MAXIMUM; i++) {
             hashEncode[i] = -1;
             hashDecode[i] = -1;
         }
 
-        this.portList = new ArrayList<>(portList);
+        this.portList = new Airport[portSize];
+        for (int i = 0; i < portSize; i++) {
+            this.portList[i] = portList.get(i);
+        }
 
         // initialize hash tables
         for (int i = 0; i < portSize; i++) {
 
-            hashEncode[portList.get(i).portID] = i;
-            hashDecode[i] = portList.get(i).portID;
+            hashEncode[this.portList[i].portID] = i;
+            hashDecode[i] = this.portList[i].portID;
 
         }
 
@@ -63,11 +66,12 @@ public class Planner {
             return new Itinerary(new LinkedList<>());
         }
 
-        // in this particular case, we assume that the first airport doesn't have
+        // we assume that the first airport doesn't have
         // connection time
-        int ct = portList.get(startID).connectTime;
-        portList.get(startID).connectTime = 0;
+        int ct = portList[startID].connectTime;
+        portList[startID].connectTime = 0;
 
+        // initialize dist array as inf
         int[] dist = new int[portSize];
         for (int i = 0; i < portSize; i++) {
             dist[i] = INF;
@@ -92,7 +96,7 @@ public class Planner {
                 continue;
             for (Flight flt : flightList[curNode]) {
                 int nextNode = hashEncode[flt.arrivalPortID];
-                int w = flt.totalTime(portList.get(curNode), d);
+                int w = flt.totalTime(portList[curNode], d);
                 if (dist[nextNode] > dist[curNode] + w) {
                     dist[nextNode] = dist[curNode] + w;
                     preFlight[nextNode] = flt;
@@ -114,7 +118,7 @@ public class Planner {
         // }
 
         // restore first airport connectTime
-        portList.get(startID).connectTime = ct;
+        portList[startID].connectTime = ct;
 
         return new Itinerary(itinerary);
     }
@@ -130,30 +134,18 @@ public class Planner {
 
         @Override
         public int compareTo(Pair p) {
-            if (this.first < p.first) {
-                return -1;
-            } else if (this.first > p.first) {
-                return 1;
-            } else {
-                if (this.second < p.second) {
-                    return -1;
-                } else if (this.second > p.second) {
-                    return 1;
-                }
-            }
-            return 0;
+            return this.first - p.first;
         }
     }
 
-    private static int HASHMAX = 19683;
     private static int INF = Integer.MAX_VALUE;
-    private ArrayList<Airport> portList;
+    private Airport[] portList;
     private ArrayList<Flight>[] flightList;
 
-    private int[] hashEncode = new int[HASHMAX];
-    private int[] hashDecode = new int[HASHMAX];
+    private int[] hashEncode = new int[encoder.MAXIMUM];
+    private int[] hashDecode = new int[encoder.MAXIMUM];
 
     private int portSize;
 
-    private Airport.Encode encoder = new Airport.Encode();
+    private static Airport.Encode encoder = new Airport.Encode();
 }
