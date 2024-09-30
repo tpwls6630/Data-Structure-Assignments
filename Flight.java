@@ -10,14 +10,17 @@
  * 
  *      This file implement smallest element Flight
  *      Flight will be used as an Edge in graph
+ * 
+ *      Each flight has departure port, time and arrival port, time.
+ *      
+ *      Every time is stored as minute. 1 hour is same to 60 minutes.
  */
+
 
 public class Flight {
 
     public String departPortName; // port name
     public String arrivalPortName; // port name
-    public int departPortID; // port id encoded the port name
-    public int arrivalPortID; // port id encoded the port name
     public int departTime; // when this flight will depart. as minute notation
     public int arrivalTime; // when this flight will depart. as minute notation
 
@@ -26,9 +29,10 @@ public class Flight {
     }
 
     // Constructor
+    //
+    // store arguments to field almost directly
     public Flight(String src, String dest, String stime, String dtime) {
-        departPortID = encoder.encode(src);
-        arrivalPortID = encoder.encode(dest);
+
         departPortName = src;
         arrivalPortName = dest;
         try {
@@ -42,8 +46,14 @@ public class Flight {
         arrivalTime = encoder.hmToMinute(arrivalTime);
     }
 
-    // Calculate and return total time from curTime to arrival at the destination
-    // that the passenger should take
+    // Calculate and return total time that the passenger should take from curTime to arrival at the destination
+    //
+    // curTime can exceed 24hours. So before calculation, execute modulo operation.
+    // If after waiting connection time from current time exceeded departure time of this flight,
+    // the passenger should take next day flight.
+    // waitTime += ... is the calculation.
+    //
+    // TravelTime is simply arrivalTime - departTime.
     public int totalTime(Airport port, int curTime) {
 
         curTime %= encoder.ONEDAY;
@@ -53,23 +63,17 @@ public class Flight {
 
         int travelTime = arrivalTime - departTime; // Flight time
         if (travelTime < 0)
+        
             travelTime += encoder.ONEDAY;
 
         return waitTime + travelTime; // can exceed 24h = 1440m
     }
 
+    // Print the information of this flight as specific format.
     public void print() {
         System.out
                 .print(String.format("[%s->%s:%04d->%04d]", departPortName, arrivalPortName,
                         encoder.minuteToHM(departTime), encoder.minuteToHM(arrivalTime)));
-    }
-
-    // just for debug
-    public void debug() {
-        System.out.println(String.format("Flight debug\n\tdPortName : %s\n\tdPortID : %d\n\tdTime : %04d",
-                departPortName, departPortID, departTime));
-        System.out.println(String.format("\n\taPortName : %s\n\taPortID : %d\n\taTime : %04d",
-                arrivalPortName, arrivalPortID, arrivalTime));
     }
 
     // Flight also need encoder from airport class
